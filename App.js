@@ -171,4 +171,3 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 'auto', padding: 15, alignItems: 'center' },
   logoutText: { color: '#ff4444', fontWeight: 'bold', fontSize: 16 }
 });
-    
