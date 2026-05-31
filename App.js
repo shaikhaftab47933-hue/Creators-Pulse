@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+  import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView } from 'react-native';
 
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
@@ -15,7 +15,7 @@ export default function App() {
 
   const signUp = async () => {
     const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !password) return Alert.alert("Error", "Email aur Password dono daalna zaroori hai!");
+    if (!cleanEmail || !password) return Alert.alert("Error", "Email and Password are required!");
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
@@ -24,18 +24,18 @@ export default function App() {
         body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-      if (data.error) Alert.alert("Signup Error ❌", data.error_description || data.msg);
+      if (data.error) Alert.alert("Error", data.error_description || data.msg);
       else {
-         Alert.alert("Success! 🎉", "Aapka account ban gaya hai!");
+         Alert.alert("Success", "Account Create Successful");
          setUser(data.user || { email: cleanEmail }); 
       }
-    } catch (error) { Alert.alert("Internet Error", "Network problem hai."); } 
+    } catch (error) { Alert.alert("Error", "Network problem"); } 
     finally { setLoading(false); }
   };
 
   const signIn = async () => {
     const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !password) return Alert.alert("Error", "Email aur password daaliye!");
+    if (!cleanEmail || !password) return Alert.alert("Error", "Email and Password are required!");
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
@@ -44,9 +44,12 @@ export default function App() {
         body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-      if (data.error) Alert.alert("Login Failed ❌", "Email ya password galat hai!");
-      else if (data.access_token || data.user) setUser(data.user || { email: cleanEmail });
-    } catch (error) { Alert.alert("Internet Error", "Network problem hai."); } 
+      if (data.error) Alert.alert("Error", "Login Failed");
+      else if (data.access_token || data.user) {
+        Alert.alert("Success", "Login Successful");
+        setUser(data.user || { email: cleanEmail });
+      }
+    } catch (error) { Alert.alert("Error", "Network problem"); } 
     finally { setLoading(false); }
   };
 
@@ -112,7 +115,7 @@ export default function App() {
             <View style={styles.card}>
               <Text style={styles.balanceTitle}>Available Balance</Text>
               <Text style={styles.balanceAmt}>₹0.00</Text>
-              <TouchableOpacity style={styles.withdrawBtn} onPress={() => Alert.alert("KYC Pending", "Paise nikalne ke liye KYC form bharo.")}>
+              <TouchableOpacity style={styles.withdrawBtn} onPress={() => Alert.alert("KYC Pending", "KYC form is pending.")}>
                 <Text style={styles.withdrawText}>Complete KYC / Withdraw</Text>
               </TouchableOpacity>
             </View>
@@ -163,7 +166,6 @@ export default function App() {
         {renderScreen()}
       </View>
 
-      {/* YAHAN PADDING BOTTOM BADHAI GAYI HAI TAARI SYSTEM BUTTONS SE ALAG DIKHE */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Home')}>
           <Text style={styles.navIcon}>{activeTab === 'Home' ? '🏠' : '🛖'}</Text>
@@ -234,11 +236,11 @@ const styles = StyleSheet.create({
   helpBox: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 15 },
   helpText: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
 
-  // IS HISSE KO THEEK KIYA GAYA HAI (paddingBottom: 35)
-  bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 35, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  // FINAL FIX: PADDING BOTTOM 65 KAR DIYA GAYA HAI
+  bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   navItem: { flex: 1, alignItems: 'center' },
-  navIcon: { fontSize: 26, marginBottom: 6 }, // Icon ko bada kiya hai
-  navText: { color: '#aaa', fontSize: 13, fontWeight: 'bold' }, // Text ko thoda bada aur saaf kiya hai
-  activeNavText: { color: '#ff7a00', fontSize: 14 } // Select hone par aur bada dikhega
+  navIcon: { fontSize: 26, marginBottom: 6 }, 
+  navText: { color: '#aaa', fontSize: 13, fontWeight: 'bold' }, 
+  activeNavText: { color: '#ff7a00', fontSize: 14 } 
 });
-  
+      
