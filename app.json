@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "awkward-orange-sandwich2",
+    "name": "Creators Pulse",
     "slug": "creators-pulse",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
