@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal } from 'react-native';
 
-// URL aur ekdum sahi theek ki hui Chabi (Capital E ko chhota e kar diya hai)
+// URL aur Asli Chabi (Corrected 'e')
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
 
@@ -10,11 +10,14 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Navigation aur Menu States
+  const [activeTab, setActiveTab] = useState('Home'); 
+  const [menuOpen, setMenuOpen] = useState(false); // Three-dot menu ke liye
 
   const signUp = async () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !password) return Alert.alert("Error", "Email aur Password dono daalna zaroori hai!");
-
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
@@ -23,24 +26,18 @@ export default function App() {
         body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-
-      if (data.error) {
-         Alert.alert("Signup Error ❌", data.error_description || data.msg || "Account nahi ban paya.");
-      } else {
-         Alert.alert("Success! 🎉", "Aapka account ban gaya hai aur login ho gaya hai!");
+      if (data.error) Alert.alert("Signup Error ❌", data.error_description || data.msg);
+      else {
+         Alert.alert("Success! 🎉", "Aapka account ban gaya hai!");
          setUser(data.user || { email: cleanEmail }); 
       }
-    } catch (error) {
-      Alert.alert("Internet Error", "Network problem hai.");
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { Alert.alert("Internet Error", "Network problem hai."); } 
+    finally { setLoading(false); }
   };
 
   const signIn = async () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !password) return Alert.alert("Error", "Email aur password daaliye!");
-
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
@@ -49,57 +46,26 @@ export default function App() {
         body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-
-      if (data.error) {
-        Alert.alert("Login Failed ❌", data.error_description || data.msg || "Email ya password galat hai!");
-      } else if (data.access_token || data.user) {
-        setUser(data.user || { email: cleanEmail });
-      } else {
-        Alert.alert("Developer Message", JSON.stringify(data));
-      }
-    } catch (error) {
-      Alert.alert("Internet Error", "Network problem hai.");
-    } finally {
-      setLoading(false);
-    }
+      if (data.error) Alert.alert("Login Failed ❌", "Email ya password galat hai!");
+      else if (data.access_token || data.user) setUser(data.user || { email: cleanEmail });
+    } catch (error) { Alert.alert("Internet Error", "Network problem hai."); } 
+    finally { setLoading(false); }
   };
 
+  // Login Screen
   if (!user) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loginContainer}>
         <StatusBar barStyle="light-content" />
         <Text style={styles.logo}>CP</Text>
         <Text style={styles.title}>Creators Pulse</Text>
-
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email Address"
-            placeholderTextColor="#999"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          {loading ? (
-            <ActivityIndicator size="large" color="#ff7a00" style={{ marginTop: 20 }} />
-          ) : (
+          <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor="#999" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+          <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#999" secureTextEntry value={password} onChangeText={setPassword} />
+          {loading ? <ActivityIndicator size="large" color="#ff7a00" style={{ marginTop: 20 }} /> : (
             <>
-              <TouchableOpacity style={styles.loginBtn} onPress={signIn}>
-                <Text style={styles.loginText}>Log In</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.signupBtn} onPress={signUp}>
-                <Text style={styles.signupText}>Create New Account</Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.loginBtn} onPress={signIn}><Text style={styles.loginText}>Log In</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.signupBtn} onPress={signUp}><Text style={styles.signupText}>Create New Account</Text></TouchableOpacity>
             </>
           )}
         </View>
@@ -107,42 +73,150 @@ export default function App() {
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome,</Text>
-        <Text style={styles.emailText}>{user.email}</Text>
-      </View>
+  // ALAG-ALAG SCREENS
+  const renderScreen = () => {
+    switch (activeTab) {
+      case 'Home':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>Hello Creator! 👋</Text>
+            <Text style={styles.screenSub}>Explore the creator universe.</Text>
+            <View style={styles.brandCard}><Text style={styles.brandName}>Your Total Reach</Text><Text style={styles.brandPay}>0 Views</Text></View>
+          </View>
+        );
+      case 'AI Studio':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>AI Video Studio 🤖</Text>
+            <Text style={styles.screenSub}>Apni script yahan likhein aur jadoo dekhein.</Text>
+            <TextInput style={[styles.input, {height: 120, textAlignVertical: 'top'}]} placeholder="Kahani yahan type karein..." placeholderTextColor="#999" multiline />
+            <TouchableOpacity style={styles.loginBtn}><Text style={styles.loginText}>Generate AI Video</Text></TouchableOpacity>
+          </View>
+        );
+      case 'Reels':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>Create Reels 🎬</Text>
+            <Text style={styles.screenSub}>Apni videos upload karein aur viral hon!</Text>
+            <TouchableOpacity style={styles.uploadBtn}><Text style={styles.uploadText}>+ Upload New Reel</Text></TouchableOpacity>
+          </View>
+        );
+      case 'Help':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>Help & Support 🎧</Text>
+            <Text style={styles.screenSub}>Humari team aapse 24/7 juri hai.</Text>
+            <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Chat with Support Team</Text></TouchableOpacity>
+          </View>
+        );
+      // Three-Dot menu wale options
+      case 'Wallet':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>Wallet & KYC 💰</Text>
+            <View style={styles.card}>
+              <Text style={styles.balanceTitle}>Available Balance</Text>
+              <Text style={styles.balanceAmt}>₹0.00</Text>
+              <TouchableOpacity style={styles.withdrawBtn} onPress={() => Alert.alert("KYC Pending", "Paise nikalne ke liye KYC form bharo.")}>
+                <Text style={styles.withdrawText}>Complete KYC / Withdraw</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      case 'Settings':
+        return (
+          <View style={styles.screenContent}>
+            <Text style={styles.screenTitle}>Settings ⚙️</Text>
+            <Text style={styles.screenSub}>Account: {user.email}</Text>
+            <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Change Password</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Delete Account</Text></TouchableOpacity>
+          </View>
+        );
+    }
+  };
 
-      <View style={styles.card}>
-        <Text style={styles.balanceTitle}>Wallet Balance</Text>
-        <Text style={styles.balanceAmt}>₹0.00</Text>
-        <TouchableOpacity style={styles.withdrawBtn} onPress={() => Alert.alert("KYC Pending", "Paise nikalne ke liye pehle apni KYC complete karein.")}>
-          <Text style={styles.withdrawText}>Withdraw / KYC</Text>
+  return (
+    <View style={styles.appContainer}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* HEADER (Jisme Logo aur Three Dots hain) */}
+      <View style={styles.header}>
+        <Text style={styles.headerLogo}>CP</Text>
+        <TouchableOpacity onPress={() => setMenuOpen(true)}>
+          <Text style={styles.threeDots}>⋮</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.grid}>
-        <View style={styles.gridBox}>
-          <Text style={styles.boxTitle}>AI Video Studio</Text>
-          <Text style={styles.boxSub}>Generate Content</Text>
-        </View>
-        <View style={styles.gridBox}>
-          <Text style={styles.boxTitle}>Brand Collabs</Text>
-          <Text style={styles.boxSub}>Find Sponsors</Text>
-        </View>
+      {/* 3-DOT MENU POPUP (Modal) */}
+      <Modal visible={menuOpen} transparent={true} animationType="fade">
+        <TouchableOpacity style={styles.modalBg} activeOpacity={1} onPress={() => setMenuOpen(false)}>
+          <View style={styles.menuBox}>
+            <Text style={styles.menuEmail}>{user.email}</Text>
+            <View style={styles.menuLine} />
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Wallet'); setMenuOpen(false); }}>
+              <Text style={styles.menuText}>💰 Wallet / KYC</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Settings'); setMenuOpen(false); }}>
+              <Text style={styles.menuText}>⚙️ Settings</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setUser(null); setMenuOpen(false); }}>
+              <Text style={[styles.menuText, {color: '#ff4444'}]}>🚪 Log Out</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      
+      {/* Beech ka Content Area */}
+      <View style={styles.mainArea}>
+        {renderScreen()}
       </View>
 
-      <TouchableOpacity style={styles.logoutBtn} onPress={() => setUser(null)}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
+      {/* NICHE KA NAVIGATION BAR (Sirf main features) */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Home')}>
+          <Text style={styles.navIcon}>{activeTab === 'Home' ? '🏠' : '🛖'}</Text>
+          <Text style={[styles.navText, activeTab === 'Home' && styles.activeNavText]}>Home</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('AI Studio')}>
+          <Text style={styles.navIcon}>🤖</Text>
+          <Text style={[styles.navText, activeTab === 'AI Studio' && styles.activeNavText]}>AI Studio</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Reels')}>
+          <Text style={styles.navIcon}>🎬</Text>
+          <Text style={[styles.navText, activeTab === 'Reels' && styles.activeNavText]}>Create Reels</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Help')}>
+          <Text style={styles.navIcon}>🎧</Text>
+          <Text style={[styles.navText, activeTab === 'Help' && styles.activeNavText]}>Help</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
+// STYLES
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0c29', padding: 20, justifyContent: 'center' },
+  loginContainer: { flex: 1, backgroundColor: '#0f0c29', padding: 20, justifyContent: 'center' },
+  appContainer: { flex: 1, backgroundColor: '#0f0c29' },
+  
+  // Header Styles
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 50, paddingHorizontal: 20, paddingBottom: 15, backgroundColor: '#1e1b4b' },
+  headerLogo: { fontSize: 24, fontWeight: 'bold', color: '#a100ff' },
+  threeDots: { fontSize: 30, color: '#fff', fontWeight: 'bold', paddingHorizontal: 10 },
+  
+  mainArea: { flex: 1, padding: 20 },
+  
+  // Menu Popup Styles
+  modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start', alignItems: 'flex-end' },
+  menuBox: { backgroundColor: '#312e81', width: 220, marginTop: 90, marginRight: 20, borderRadius: 15, padding: 15, elevation: 5 },
+  menuEmail: { color: '#999', fontSize: 12, marginBottom: 10, textAlign: 'center' },
+  menuLine: { height: 1, backgroundColor: '#4f46e5', marginBottom: 10 },
+  menuItem: { paddingVertical: 12 },
+  menuText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+
   logo: { fontSize: 60, fontWeight: 'bold', color: '#a100ff', textAlign: 'center', marginBottom: 10 },
   title: { fontSize: 28, fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: 40 },
   form: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15 },
@@ -151,19 +225,30 @@ const styles = StyleSheet.create({
   loginText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   signupBtn: { padding: 15, alignItems: 'center', marginTop: 15 },
   signupText: { color: '#a100ff', fontWeight: 'bold', fontSize: 16 },
-  header: { marginTop: 40, marginBottom: 30 },
-  welcomeText: { color: '#999', fontSize: 18 },
-  emailText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
-  card: { backgroundColor: '#1e1b4b', padding: 25, borderRadius: 15, alignItems: 'center', marginBottom: 30 },
+  
+  screenContent: { flex: 1 },
+  screenTitle: { fontSize: 26, fontWeight: 'bold', color: '#fff', marginBottom: 5 },
+  screenSub: { fontSize: 14, color: '#999', marginBottom: 20 },
+  card: { backgroundColor: '#1e1b4b', padding: 25, borderRadius: 15, alignItems: 'center', marginBottom: 20 },
   balanceTitle: { color: '#999', fontSize: 16, marginBottom: 10 },
-  balanceAmt: { color: '#4ade80', fontSize: 36, fontWeight: 'bold', marginBottom: 20 },
+  balanceAmt: { color: '#4ade80', fontSize: 40, fontWeight: 'bold', marginBottom: 20 },
   withdrawBtn: { backgroundColor: '#a100ff', paddingHorizontal: 30, paddingVertical: 12, borderRadius: 25 },
   withdrawText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  grid: { flexDirection: 'row', justifyContent: 'space-between' },
-  gridBox: { backgroundColor: '#312e81', width: '48%', padding: 20, borderRadius: 15, alignItems: 'center' },
-  boxTitle: { color: '#fff', fontWeight: 'bold', fontSize: 16, marginBottom: 5, textAlign: 'center' },
-  boxSub: { color: '#999', fontSize: 12, textAlign: 'center' },
-  logoutBtn: { marginTop: 'auto', padding: 15, alignItems: 'center' },
-  logoutText: { color: '#ff4444', fontWeight: 'bold', fontSize: 16 }
+  
+  brandCard: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  brandName: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  brandPay: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
+
+  uploadBtn: { backgroundColor: '#312e81', padding: 20, borderRadius: 15, alignItems: 'center', borderStyle: 'dashed', borderWidth: 2, borderColor: '#4f46e5' },
+  uploadText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  
+  helpBox: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 15 },
+  helpText: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
+
+  bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingVertical: 15, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  navItem: { flex: 1, alignItems: 'center' },
+  navIcon: { fontSize: 22, marginBottom: 4 },
+  navText: { color: '#999', fontSize: 11, fontWeight: 'bold' },
+  activeNavText: { color: '#ff7a00' } // Ab select hone par orange color!
 });
-    
+            
