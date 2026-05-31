@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar } from 'react-native';
 
+// Aapke Supabase Database ka URL aur Asli Chabi (Key) jo maine fit kar di hai
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
-const SUPABASE_KEY = 'Sb_publishable__nKVS2umplsCOxHv_b1uYg_knfNPLd1';
+const SUPABASE_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
 
 export default function App() {
   const [email, setEmail] = useState('');
@@ -171,3 +172,4 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 'auto', padding: 15, alignItems: 'center' },
   logoutText: { color: '#ff4444', fontWeight: 'bold', fontSize: 16 }
 });
+  
