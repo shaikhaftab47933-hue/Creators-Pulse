@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar } from 'react-native';
 
-// Aapke Supabase Database ki Chabiyan
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'Sb_publishable__nKVS2umplsCOxHv_b1uYg_knfNPLd1';
 
@@ -11,51 +10,58 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Naya Account Banane Ka Code
   const signUp = async () => {
-    if (!email || !password) return Alert.alert("Error", "Bhai, Email aur Password dono daalna zaroori hai!");
+    // Ye line automatically extra space hata degi
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !password) return Alert.alert("Error", "Email aur Password dono daalna zaroori hai!");
+    
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-      if (data.error) throw new Error(data.error_description || data.msg || "Signup fail ho gaya.");
-      Alert.alert("Success! 🎉", "Aapka account ban gaya hai! Ab 'Log In' button par click karein.");
+      
+      if (data.error) {
+         Alert.alert("Signup Error ❌", data.error_description || data.msg || "Account nahi ban paya.");
+      } else {
+         Alert.alert("Success! 🎉", "Account ban gaya hai! Ab 'Log In' button dabayein.");
+      }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Internet Error", "Bhai, internet connection check karo.");
+    } finally {
+      setLoading(false); // Ye chakri ko hamesha band karega chahe jo ho jaye
     }
-    setLoading(false);
   };
 
-  // Login Karne Ka Code
   const signIn = async () => {
-    if (!email || !password) return Alert.alert("Error", "Email aur password daaliye!");
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !password) return Alert.alert("Error", "Email aur password daaliye!");
+    
     setLoading(true);
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
         method: 'POST',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-      if (data.error) throw new Error("Email ya password galat hai.");
-      setUser(data.user); // Login hone par user data save karega
+      
+      if (data.error) {
+        Alert.alert("Login Failed ❌", "Email ya password galat hai! Ya purana account verify nahi hua.");
+      } else if (data.user) {
+        setUser(data.user); // Login Success aur seedha Dashboard!
+      }
     } catch (error) {
-      Alert.alert("Login Failed", error.message);
+      Alert.alert("Internet Error", "Bhai, internet connection check karo.");
+    } finally {
+      setLoading(false); 
     }
-    setLoading(false);
   };
 
-  // Agar user Login NAHI hai, toh ye wala page dikhega (Login Screen)
+  // Agar user Login NAHI hai (Login Screen)
   if (!user) {
     return (
       <View style={styles.container}>
@@ -71,6 +77,7 @@ export default function App() {
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
+            keyboardType="email-address"
           />
           <TextInput 
             style={styles.input} 
@@ -98,7 +105,7 @@ export default function App() {
     );
   }
 
-  // Agar user Login HO GAYA hai, toh usko asli Dashboard dikhega
+  // Agar user Login HO GAYA hai (Dashboard Screen)
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -133,7 +140,6 @@ export default function App() {
   );
 }
 
-// App ki Design (Colors aur look)
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f0c29', padding: 20, justifyContent: 'center' },
   logo: { fontSize: 60, fontWeight: 'bold', color: '#a100ff', textAlign: 'center', marginBottom: 10 },
@@ -144,8 +150,6 @@ const styles = StyleSheet.create({
   loginText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   signupBtn: { padding: 15, alignItems: 'center', marginTop: 15 },
   signupText: { color: '#a100ff', fontWeight: 'bold', fontSize: 16 },
-  
-  // Dashboard Styles
   header: { marginTop: 40, marginBottom: 30 },
   welcomeText: { color: '#999', fontSize: 18 },
   emailText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
@@ -161,3 +165,4 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 'auto', padding: 15, alignItems: 'center' },
   logoutText: { color: '#ff4444', fontWeight: 'bold', fontSize: 16 }
 });
+              
