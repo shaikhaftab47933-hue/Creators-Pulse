@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView } from 'react-native';
 
-// URL aur Asli Chabi (Corrected 'e')
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
 
@@ -11,9 +10,8 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   
-  // Navigation aur Menu States
   const [activeTab, setActiveTab] = useState('Home'); 
-  const [menuOpen, setMenuOpen] = useState(false); // Three-dot menu ke liye
+  const [menuOpen, setMenuOpen] = useState(false); 
 
   const signUp = async () => {
     const cleanEmail = email.trim().toLowerCase();
@@ -52,11 +50,10 @@ export default function App() {
     finally { setLoading(false); }
   };
 
-  // Login Screen
   if (!user) {
     return (
-      <View style={styles.loginContainer}>
-        <StatusBar barStyle="light-content" />
+      <SafeAreaView style={styles.loginContainer}>
+        <StatusBar barStyle="light-content" backgroundColor="#0f0c29" />
         <Text style={styles.logo}>CP</Text>
         <Text style={styles.title}>Creators Pulse</Text>
         <View style={styles.form}>
@@ -69,11 +66,10 @@ export default function App() {
             </>
           )}
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
-  // ALAG-ALAG SCREENS
   const renderScreen = () => {
     switch (activeTab) {
       case 'Home':
@@ -109,7 +105,6 @@ export default function App() {
             <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Chat with Support Team</Text></TouchableOpacity>
           </View>
         );
-      // Three-Dot menu wale options
       case 'Wallet':
         return (
           <View style={styles.screenContent}>
@@ -136,10 +131,9 @@ export default function App() {
   };
 
   return (
-    <View style={styles.appContainer}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={styles.appContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="#1e1b4b" />
       
-      {/* HEADER (Jisme Logo aur Three Dots hain) */}
       <View style={styles.header}>
         <Text style={styles.headerLogo}>CP</Text>
         <TouchableOpacity onPress={() => setMenuOpen(true)}>
@@ -147,7 +141,6 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* 3-DOT MENU POPUP (Modal) */}
       <Modal visible={menuOpen} transparent={true} animationType="fade">
         <TouchableOpacity style={styles.modalBg} activeOpacity={1} onPress={() => setMenuOpen(false)}>
           <View style={styles.menuBox}>
@@ -166,12 +159,11 @@ export default function App() {
         </TouchableOpacity>
       </Modal>
       
-      {/* Beech ka Content Area */}
       <View style={styles.mainArea}>
         {renderScreen()}
       </View>
 
-      {/* NICHE KA NAVIGATION BAR (Sirf main features) */}
+      {/* YAHAN PADDING BOTTOM BADHAI GAYI HAI TAARI SYSTEM BUTTONS SE ALAG DIKHE */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Home')}>
           <Text style={styles.navIcon}>{activeTab === 'Home' ? '🏠' : '🛖'}</Text>
@@ -185,7 +177,7 @@ export default function App() {
 
         <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Reels')}>
           <Text style={styles.navIcon}>🎬</Text>
-          <Text style={[styles.navText, activeTab === 'Reels' && styles.activeNavText]}>Create Reels</Text>
+          <Text style={[styles.navText, activeTab === 'Reels' && styles.activeNavText]}>Reels</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Help')}>
@@ -193,26 +185,23 @@ export default function App() {
           <Text style={[styles.navText, activeTab === 'Help' && styles.activeNavText]}>Help</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
-// STYLES
 const styles = StyleSheet.create({
   loginContainer: { flex: 1, backgroundColor: '#0f0c29', padding: 20, justifyContent: 'center' },
   appContainer: { flex: 1, backgroundColor: '#0f0c29' },
   
-  // Header Styles
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 50, paddingHorizontal: 20, paddingBottom: 15, backgroundColor: '#1e1b4b' },
-  headerLogo: { fontSize: 24, fontWeight: 'bold', color: '#a100ff' },
-  threeDots: { fontSize: 30, color: '#fff', fontWeight: 'bold', paddingHorizontal: 10 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, paddingHorizontal: 20, paddingBottom: 15, backgroundColor: '#1e1b4b' },
+  headerLogo: { fontSize: 26, fontWeight: 'bold', color: '#a100ff' },
+  threeDots: { fontSize: 32, color: '#fff', fontWeight: 'bold', paddingHorizontal: 10 },
   
   mainArea: { flex: 1, padding: 20 },
   
-  // Menu Popup Styles
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start', alignItems: 'flex-end' },
-  menuBox: { backgroundColor: '#312e81', width: 220, marginTop: 90, marginRight: 20, borderRadius: 15, padding: 15, elevation: 5 },
-  menuEmail: { color: '#999', fontSize: 12, marginBottom: 10, textAlign: 'center' },
+  menuBox: { backgroundColor: '#312e81', width: 220, marginTop: 60, marginRight: 20, borderRadius: 15, padding: 15, elevation: 5 },
+  menuEmail: { color: '#bbb', fontSize: 13, marginBottom: 10, textAlign: 'center' },
   menuLine: { height: 1, backgroundColor: '#4f46e5', marginBottom: 10 },
   menuItem: { paddingVertical: 12 },
   menuText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
@@ -222,22 +211,22 @@ const styles = StyleSheet.create({
   form: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15 },
   input: { backgroundColor: '#312e81', color: '#fff', padding: 15, borderRadius: 10, marginBottom: 15, fontSize: 16 },
   loginBtn: { backgroundColor: '#ff7a00', padding: 15, borderRadius: 10, alignItems: 'center', marginTop: 10 },
-  loginText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  loginText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
   signupBtn: { padding: 15, alignItems: 'center', marginTop: 15 },
   signupText: { color: '#a100ff', fontWeight: 'bold', fontSize: 16 },
   
   screenContent: { flex: 1 },
-  screenTitle: { fontSize: 26, fontWeight: 'bold', color: '#fff', marginBottom: 5 },
-  screenSub: { fontSize: 14, color: '#999', marginBottom: 20 },
+  screenTitle: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 5 },
+  screenSub: { fontSize: 15, color: '#aaa', marginBottom: 20 },
   card: { backgroundColor: '#1e1b4b', padding: 25, borderRadius: 15, alignItems: 'center', marginBottom: 20 },
-  balanceTitle: { color: '#999', fontSize: 16, marginBottom: 10 },
-  balanceAmt: { color: '#4ade80', fontSize: 40, fontWeight: 'bold', marginBottom: 20 },
-  withdrawBtn: { backgroundColor: '#a100ff', paddingHorizontal: 30, paddingVertical: 12, borderRadius: 25 },
+  balanceTitle: { color: '#bbb', fontSize: 16, marginBottom: 10 },
+  balanceAmt: { color: '#4ade80', fontSize: 42, fontWeight: 'bold', marginBottom: 20 },
+  withdrawBtn: { backgroundColor: '#a100ff', paddingHorizontal: 30, paddingVertical: 14, borderRadius: 25 },
   withdrawText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   
   brandCard: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   brandName: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  brandPay: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
+  brandPay: { color: '#4ade80', fontSize: 18, fontWeight: 'bold' },
 
   uploadBtn: { backgroundColor: '#312e81', padding: 20, borderRadius: 15, alignItems: 'center', borderStyle: 'dashed', borderWidth: 2, borderColor: '#4f46e5' },
   uploadText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
@@ -245,10 +234,11 @@ const styles = StyleSheet.create({
   helpBox: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 15 },
   helpText: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
 
-  bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingVertical: 15, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  // IS HISSE KO THEEK KIYA GAYA HAI (paddingBottom: 35)
+  bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 35, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   navItem: { flex: 1, alignItems: 'center' },
-  navIcon: { fontSize: 22, marginBottom: 4 },
-  navText: { color: '#999', fontSize: 11, fontWeight: 'bold' },
-  activeNavText: { color: '#ff7a00' } // Ab select hone par orange color!
+  navIcon: { fontSize: 26, marginBottom: 6 }, // Icon ko bada kiya hai
+  navText: { color: '#aaa', fontSize: 13, fontWeight: 'bold' }, // Text ko thoda bada aur saaf kiya hai
+  activeNavText: { color: '#ff7a00', fontSize: 14 } // Select hone par aur bada dikhega
 });
-            
+  
