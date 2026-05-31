@@ -1,57 +1,11 @@
-# 🚀 Creators Pulse
+# Sample Snack app
 
-A comprehensive platform for Instagram, Facebook, and YouTube creators to track growth, engagement, and earnings.
+Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
 
-## ✨ Features
+When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
 
-- 📊 **Real-time Analytics Dashboard**
-- 📅 **Content Calendar & Scheduling**
-- 📈 **Engagement Tracking**
-- 💰 **Earnings Insights**
-- 🎯 **Growth Recommendations**
-- 👥 **Audience Analytics**
+All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
 
-## 🛠 Tech Stack
+If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
 
-- **Frontend**: Next.js 14 + React + Tailwind CSS
-- **Backend**: Node.js + Express + TypeScript
-- **Database**: MongoDB
-- **Auth**: JWT + OAuth2
-
-## 📁 Project Structure
-
-```
-creators-pulse/
-├── frontend/          # Next.js App
-├── backend/           # Express API
-├── docs/              # Documentation
-└── README.md
-```
-
-## 🚀 Quick Start
-
-### Backend
-```bash
-cd backend
-npm install
-cp .env.example .env.local
-npm run dev
-```
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Access: `http://localhost:3000`
-
-## 📚 Documentation
-
-- [API Docs](./docs/API.md)
-- [Contributing](./CONTRIBUTING.md)
-
-## 📄 License
-
-MIT License
+Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
