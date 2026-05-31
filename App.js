@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar } from 'react-native';
 
-// Aapke Supabase Database ka URL aur Asli Chabi (Key) jo maine fit kar di hai
+// URL aur ekdum sahi theek ki hui Chabi (Capital E ko chhota e kar diya hai)
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
-const SUPABASE_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
 
 export default function App() {
   const [email, setEmail] = useState('');
@@ -11,7 +11,6 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Naya Account Banane aur Direct Login karne ka Code
   const signUp = async () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !password) return Alert.alert("Error", "Email aur Password dono daalna zaroori hai!");
@@ -28,7 +27,6 @@ export default function App() {
       if (data.error) {
          Alert.alert("Signup Error ❌", data.error_description || data.msg || "Account nahi ban paya.");
       } else {
-         // Success hote hi Automatic Login!
          Alert.alert("Success! 🎉", "Aapka account ban gaya hai aur login ho gaya hai!");
          setUser(data.user || { email: cleanEmail }); 
       }
@@ -39,7 +37,6 @@ export default function App() {
     }
   };
 
-  // Purane Account se Login karne ka Code
   const signIn = async () => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !password) return Alert.alert("Error", "Email aur password daaliye!");
@@ -56,7 +53,6 @@ export default function App() {
       if (data.error) {
         Alert.alert("Login Failed ❌", data.error_description || data.msg || "Email ya password galat hai!");
       } else if (data.access_token || data.user) {
-        // 100% Guaranteed Login Success
         setUser(data.user || { email: cleanEmail });
       } else {
         Alert.alert("Developer Message", JSON.stringify(data));
@@ -68,7 +64,6 @@ export default function App() {
     }
   };
 
-  // Login Screen UI
   if (!user) {
     return (
       <View style={styles.container}>
@@ -112,7 +107,6 @@ export default function App() {
     );
   }
 
-  // Dashboard Screen UI
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -172,4 +166,4 @@ const styles = StyleSheet.create({
   logoutBtn: { marginTop: 'auto', padding: 15, alignItems: 'center' },
   logoutText: { color: '#ff4444', fontWeight: 'bold', fontSize: 16 }
 });
-  
+    
