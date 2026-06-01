@@ -1,5 +1,5 @@
-  import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView, Image } from 'react-native';
 
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
@@ -12,6 +12,14 @@ export default function App() {
   
   const [activeTab, setActiveTab] = useState('Home'); 
   const [menuOpen, setMenuOpen] = useState(false); 
+
+  // AI Video Dummy Feature States
+  const [script, setScript] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState('');
+  const [videoReady, setVideoReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const signUp = async () => {
     const cleanEmail = email.trim().toLowerCase();
@@ -53,6 +61,47 @@ export default function App() {
     finally { setLoading(false); }
   };
 
+  // AI Video Dummy Logic
+  const startAIBuildSimulation = () => {
+    if (!script.trim()) {
+      return Alert.alert("Error", "Please enter a script or story first!");
+    }
+
+    setGenerating(true);
+    setVideoReady(false);
+    setProgress(0);
+    setStatusText('Analyzing script themes...');
+
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 4;
+      setProgress(currentProgress);
+
+      if (currentProgress === 16) {
+        setStatusText('Generating AI characters & assets...');
+      } else if (currentProgress === 40) {
+        setStatusText('Applying Makoto Shinkai & Ghibli aesthetic...');
+      } else if (currentProgress === 64) {
+        setStatusText('Rendering high-fidelity 4K anime frames...');
+      } else if (currentProgress === 84) {
+        setStatusText('Syncing cinematic background score...');
+      } else if (currentProgress >= 100) {
+        clearInterval(interval);
+        setGenerating(false);
+        setVideoReady(true);
+        setIsPlaying(true); // Auto play simulated video
+        Alert.alert("Success", "Video Generated Successfully");
+      }
+    }, 250); // Takes around 6-7 seconds total
+  };
+
+  const resetAIStudio = () => {
+    setScript('');
+    setVideoReady(false);
+    setIsPlaying(false);
+    setProgress(0);
+  };
+
   if (!user) {
     return (
       <SafeAreaView style={styles.loginContainer}>
@@ -83,31 +132,100 @@ export default function App() {
             <View style={styles.brandCard}><Text style={styles.brandName}>Your Total Reach</Text><Text style={styles.brandPay}>0 Views</Text></View>
           </View>
         );
+
       case 'AI Studio':
         return (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>AI Video Studio 🤖</Text>
-            <Text style={styles.screenSub}>Apni script yahan likhein aur jadoo dekhein.</Text>
-            <TextInput style={[styles.input, {height: 120, textAlignVertical: 'top'}]} placeholder="Kahani yahan type karein..." placeholderTextColor="#999" multiline />
-            <TouchableOpacity style={styles.loginBtn}><Text style={styles.loginText}>Generate AI Video</Text></TouchableOpacity>
+            <Text style={styles.screenSub}>Convert scripts into cinematic anime videos.</Text>
+            
+            {/* 1. Input State */}
+            {!generating && !videoReady && (
+              <View style={styles.studioBox}>
+                <TextInput 
+                  style={[styles.input, {height: 140, textAlignVertical: 'top'}]} 
+                  placeholder="Type your scene script here... (e.g., A delivery boy meeting a billionaire girl in Mumbai rain, cinematic anime style)" 
+                  placeholderTextColor="#777" 
+                  multiline 
+                  value={script}
+                  onChangeText={setScript}
+                />
+                <TouchableOpacity style={styles.loginBtn} onPress={startAIBuildSimulation}>
+                  <Text style={styles.loginText}>Generate AI Video</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* 2. Generating Processing State */}
+            {generating && (
+              <View style={styles.processingCard}>
+                <ActivityIndicator size="large" color="#a100ff" />
+                <Text style={styles.processingPercentage}>{progress}%</Text>
+                
+                {/* Progress Bar Track */}
+                <View style={styles.progressBarTrack}>
+                  <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+                </View>
+                
+                <Text style={styles.statusText}>{statusText}</Text>
+              </View>
+            )}
+
+            {/* 3. Video Ready / Player State */}
+            {videoReady && (
+              <View style={styles.playerContainer}>
+                {/* Dummy Video Display Container */}
+                <View style={styles.videoBox}>
+                  <Image 
+                    source={{ uri: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600' }} 
+                    style={styles.videoPlaceholderImage} 
+                  />
+                  {/* Play/Pause Overlay Centered Button */}
+                  <TouchableOpacity style={styles.playOverlayBtn} onPress={() => setIsPlaying(!isPlaying)}>
+                    <Text style={styles.playOverlayIcon}>{isPlaying ? '⏸️' : '▶️'}</Text>
+                  </TouchableOpacity>
+                  
+                  {/* Simulated Video Controller Bar */}
+                  <View style={styles.videoControlsRow}>
+                    <Text style={styles.timeText}>{isPlaying ? '0:04' : '0:00'}</Text>
+                    <View style={styles.videoSeekBarTrack}>
+                      <View style={[styles.videoSeekBarFill, { width: isPlaying ? '35%' : '0%' }]} />
+                    </View>
+                    <Text style={styles.timeText}>0:15</Text>
+                  </View>
+                </View>
+
+                {/* Video Option Buttons */}
+                <TouchableOpacity style={[styles.loginBtn, {backgroundColor: '#4ade80'}]} onPress={() => Alert.alert("Success", "Reel saved to device gallery")}>
+                  <Text style={styles.loginText}>📥 Download Reel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.resetBtn} onPress={resetAIStudio}>
+                  <Text style={styles.resetBtnText}>Create Another Video</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         );
+
       case 'Reels':
         return (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Create Reels 🎬</Text>
-            <Text style={styles.screenSub}>Apni videos upload karein aur viral hon!</Text>
+            <Text style={styles.screenSub}>Upload and showcase your creations.</Text>
             <TouchableOpacity style={styles.uploadBtn}><Text style={styles.uploadText}>+ Upload New Reel</Text></TouchableOpacity>
           </View>
         );
+
       case 'Help':
         return (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Help & Support 🎧</Text>
-            <Text style={styles.screenSub}>Humari team aapse 24/7 juri hai.</Text>
+            <Text style={styles.screenSub}>Our support desk is active 24/7.</Text>
             <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Chat with Support Team</Text></TouchableOpacity>
           </View>
         );
+
       case 'Wallet':
         return (
           <View style={styles.screenContent}>
@@ -121,6 +239,7 @@ export default function App() {
             </View>
           </View>
         );
+
       case 'Settings':
         return (
           <View style={styles.screenContent}>
@@ -236,11 +355,31 @@ const styles = StyleSheet.create({
   helpBox: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 15 },
   helpText: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
 
-  // FINAL FIX: PADDING BOTTOM 65 KAR DIYA GAYA HAI
+  // AI Dummy Studio New Custom UI Styles
+  studioBox: { width: '100%' },
+  processingCard: { backgroundColor: '#1e1b4b', padding: 30, borderRadius: 20, alignItems: 'center', marginTop: 20 },
+  processingPercentage: { color: '#fff', fontSize: 32, fontWeight: 'bold', marginTop: 15 },
+  progressBarTrack: { width: '100%', height: 8, backgroundColor: '#312e81', borderRadius: 4, marginTop: 15, overflow: 'hidden' },
+  progressBarFill: { height: '100%', backgroundColor: '#a100ff', borderRadius: 4 },
+  statusText: { color: '#aaa', fontSize: 15, marginTop: 15, fontWeight: '500', textAlign: 'center' },
+  
+  playerContainer: { width: '100%', alignItems: 'center' },
+  videoBox: { width: '100%', height: 240, backgroundColor: '#000', borderRadius: 15, overflow: 'hidden', marginBottom: 20, justifyContent: 'center', alignItems: 'center', position: 'relative' },
+  videoPlaceholderImage: { width: '100%', height: '100%', position: 'absolute', opacity: 0.7 },
+  playOverlayBtn: { backgroundColor: 'rgba(0,0,0,0.6)', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center' },
+  playOverlayIcon: { fontSize: 24 },
+  videoControlsRow: { position: 'absolute', bottom: 10, left: 10, right: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  timeText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
+  navigatorButtonsLine: { height: 2, backgroundColor: 'red' },
+  videoSeekBarTrack: { flex: 1, height: 4, backgroundColor: 'rgba(255,255,255,0.3)', mx: 10, marginHorizontal: 10, borderRadius: 2, overflow: 'hidden' },
+  videoSeekBarFill: { height: '100%', backgroundColor: '#ff7a00' },
+  resetBtn: { marginTop: 15, padding: 10 },
+  resetBtnText: { color: '#a100ff', fontSize: 16, fontWeight: 'bold' },
+
   bottomNav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65, paddingHorizontal: 5, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   navItem: { flex: 1, alignItems: 'center' },
   navIcon: { fontSize: 26, marginBottom: 6 }, 
   navText: { color: '#aaa', fontSize: 13, fontWeight: 'bold' }, 
   activeNavText: { color: '#ff7a00', fontSize: 14 } 
 });
-      
+                  
