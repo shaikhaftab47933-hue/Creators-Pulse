@@ -5,6 +5,11 @@ import * as ImagePicker from 'expo-image-picker';
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
 
+const fetchWithTimeout = (url, options) => Promise.race([
+  fetch(url, options),
+  new Promise((_, r) => setTimeout(() => r(new Error('Timeout')), 9000))
+]);
+
 export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,13 +44,13 @@ export default function App() {
     setLoading(true);
     try {
       const url = type === 'up' ? `${SUPABASE_URL}/auth/v1/signup` : `${SUPABASE_URL}/auth/v1/token?grant_type=password`;
-      const response = await fetch(url, {
+      const response = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: cleanEmail, password })
       });
       const data = await response.json();
-      if (data.error) Alert.alert("Error", "Authentication Failed");
+      if (data.error) Alert.alert("Error", "Auth Failed");
       else {
         Alert.alert("Success", "Done!");
         setUser(data.user || { email: cleanEmail });
@@ -59,7 +64,7 @@ export default function App() {
     if (!kycName.trim() || !kycUpi.trim() || !kycBank.trim() || !kycIfsc.trim()) return Alert.alert("Error", "All fields required!");
     setKycSubmitting(true);
     try {
-      await fetch(`${SUPABASE_URL}/rest/v1/kyc_details`, {
+      await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/kyc_details`, {
         method: 'POST',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, full_name: kycName.trim(), upi_id: kycUpi.trim(), bank_account: kycBank.trim(), ifsc_code: kycIfsc.trim() })
@@ -71,7 +76,7 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // ASLI NETWORK AI PIPELINE GENERATOR (HTTP INTERNET BACKEND)
+  // REAL CLOUD NETWORK INTERNET VIDEO GENERATOR
   const startAIBuildSimulation = async () => {
     if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
     setGenerating(true); setVideoReady(false); setStatusText('Pinging Cloud Video Engine...');
@@ -87,17 +92,14 @@ export default function App() {
     }
   };
 
-  // 100% SECURE MOBILE GALLERY PICKER
+  // 100% REAL MOBILE GALLERY PICKER CODE
   const handleReelUpload = async () => {
     try {
-      if (!ImagePicker || !ImagePicker.requestMediaLibraryPermissionsAsync) {
-        return Alert.alert("Error", "Gallery module not initialized yet.");
-      }
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') return Alert.alert("Permission Error", "Allow storage access!");
       
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'all',
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         quality: 1,
       });
@@ -109,7 +111,7 @@ export default function App() {
         Alert.alert("Success", "Media Connected!");
       }
     } catch (err) {
-      Alert.alert("Error", "Could not open gallery on this device model.");
+      Alert.alert("Error", "Could not open gallery.");
     }
   };
 
@@ -134,7 +136,7 @@ export default function App() {
         <TouchableOpacity onPress={() => setMenuOpen(true)}><Text style={{fontSize:28,color:'#fff'}}>⋮</Text></TouchableOpacity>
       </View>
 
-      <Modal visible={menuOpen} transparent>
+      <Modal visible={menuOpen} transparent animationType="fade">
         <TouchableOpacity style={styles.mBg} onPress={() => setMenuOpen(false)}>
           <View style={styles.mBox}>
             <Text style={{color:'#bbb',marginBottom:10,textAlign:'center'}}>{user.email}</Text>
@@ -162,7 +164,7 @@ export default function App() {
         </View>}
 
         {activeTab === 'Reels' && <View style={{paddingBottom:40}}>
-          <View style={{flexDirection='row',justifyContent='space-between',alignItems='center',marginBottom:15}}>
+          <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:15}}>
             <Text style={styles.t}>Creators Feed 🎬</Text>
             <TouchableOpacity style={[styles.btn,{paddingVertical:6,paddingHorizontal:12}]} onPress={handleReelUpload}><Text style={styles.btnT}>+ Upload</Text></TouchableOpacity>
           </View>
@@ -186,7 +188,7 @@ export default function App() {
             <TextInput style={styles.input} placeholder="UPI ID" placeholderTextColor="#999" value={kycUpi} onChangeText={setKycUpi} autoCapitalize="none" />
             <TextInput style={styles.input} placeholder="Account Number" placeholderTextColor="#999" value={kycBank} onChangeText={setKycBank} keyboardType="number-pad" />
             <TextInput style={styles.input} placeholder="IFSC Code" placeholderTextColor="#999" value={kycIfsc} onChangeText={setKycIfsc} autoCapitalize="characters" />
-            {kycSubmitting ? <ActivityIndicator size="large" color="#a100ff" /> : <View style={{flexDirection='row',justifyContent:'space-between'}}>
+            {kycSubmitting ? <ActivityIndicator size="large" color="#a100ff" /> : <View style={{flexDirection:'row',justifyContent:'space-between'}}>
               <TouchableOpacity style={[styles.btn,{flex:1,marginRight:10}]} onPress={submitKyc}><Text style={styles.btnT}>Submit</Text></TouchableOpacity>
               <TouchableOpacity style={[styles.btn,{backgroundColor:'#ff4444'}]} onPress={()=>setShowKycForm(false)}><Text style={styles.btnT}>Cancel</Text></TouchableOpacity>
             </View>}
@@ -226,4 +228,4 @@ const styles = StyleSheet.create({
   reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600', marginTop: 4 }
 });
-      
+        
