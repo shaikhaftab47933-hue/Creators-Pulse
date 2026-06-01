@@ -168,8 +168,8 @@ export default function App() {
       <View style={styles.nav}>
         {['Home','AI Studio','Reels','Help'].map((t) => (
           <TouchableOpacity key={t} style={{flex:1,alignItems:'center'}} onPress={()=>setActiveTab(t)}>
-            <Text style={{fontSize:20}}>{t==='Home'?'🏠':t==='AI Studio'?'🤖':t==='Reels'?'🎬':'🎧'}</Text>
-            <Text style={{color:activeTab===t?'#ff7a00':'#aaa',fontSize:11,fontWeight:'bold'}}>{t}</Text>
+            <Text style={{fontSize:24}}>{t==='Home'?'🏠':t==='AI Studio'?'🤖':t==='Reels'?'🎬':'🎧'}</Text>
+            <Text style={{color:activeTab===t?'#ff7a00':'#aaa',fontSize:12,fontWeight:'bold',marginTop:4}}>{t}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -190,6 +190,6 @@ const styles = StyleSheet.create({
   mBox: { backgroundColor: '#312e81', width: 200, marginTop: 50, marginRight: 15, borderRadius: 10, padding: 15 },
   t: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
   card: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 12, alignItems: 'center', marginBottom: 15 },
-  nav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingVertical: 10, paddingBottom: 25 }
+  nav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65 }
 });
     
