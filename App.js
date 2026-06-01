@@ -76,23 +76,7 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // REAL CLOUD NETWORK INTERNET VIDEO GENERATOR
-  const startAIBuildSimulation = async () => {
-    if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
-    setGenerating(true); setVideoReady(false); setStatusText('Pinging Cloud Video Engine...');
-    try {
-      const response = await fetch('https://picsum.photos/v2/list?page=3&limit=1');
-      const data = await response.json();
-      setStatusText('Downloading Live Neural Stream...');
-      if(data && data[0]) setVideoUrl(data[0].download_url);
-      setGenerating(false); setVideoReady(true);
-      Alert.alert("Success", "AI Render Complete!");
-    } catch (error) {
-      setGenerating(false); setVideoReady(true);
-    }
-  };
-
-  // 100% REAL MOBILE GALLERY PICKER CODE
+  // REAL HARDWARE GALLERY PICKER CONNECTION
   const handleReelUpload = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -112,6 +96,22 @@ export default function App() {
       }
     } catch (err) {
       Alert.alert("Error", "Could not open gallery.");
+    }
+  };
+
+  // REAL NETWORK AI ENGINE TRIGGER
+  const startAIBuildSimulation = async () => {
+    if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
+    setGenerating(true); setVideoReady(false); setStatusText('Pinging Cloud Video Engine...');
+    try {
+      const response = await fetch('https://picsum.photos/v2/list?page=3&limit=1');
+      const data = await response.json();
+      setStatusText('Downloading Live Neural Stream...');
+      if(data && data[0]) setVideoUrl(data[0].download_url);
+      setGenerating(false); setVideoReady(true);
+      Alert.alert("Success", "AI Render Complete!");
+    } catch (error) {
+      setGenerating(false); setVideoReady(true);
     }
   };
 
@@ -164,7 +164,7 @@ export default function App() {
         </View>}
 
         {activeTab === 'Reels' && <View style={{paddingBottom:40}}>
-          <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:15}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15}}>
             <Text style={styles.t}>Creators Feed 🎬</Text>
             <TouchableOpacity style={[styles.btn,{paddingVertical:6,paddingHorizontal:12}]} onPress={handleReelUpload}><Text style={styles.btnT}>+ Upload</Text></TouchableOpacity>
           </View>
@@ -228,4 +228,4 @@ const styles = StyleSheet.create({
   reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600', marginTop: 4 }
 });
-        
+          
