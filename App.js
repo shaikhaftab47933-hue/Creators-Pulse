@@ -112,12 +112,12 @@ export default function App() {
         setKycCompleted(true);
         setShowKycForm(false);
       } else {
-        Alert.alert("Success", "KYC Submitted (Sandbox Mode Active)");
+        Alert.alert("Success", "KYC Submitted (Sandbox Mode)");
         setKycCompleted(true);
         setShowKycForm(false);
       }
     } catch (error) {
-      Alert.alert("Success", "KYC Submitted (Offline Sandbox Mode)");
+      Alert.alert("Success", "KYC Submitted (Sandbox Mode)");
       setKycCompleted(true);
       setShowKycForm(false);
     } finally {
@@ -179,18 +179,35 @@ export default function App() {
     );
   }
 
-  const renderScreen = () => {
-    switch (activeTab) {
-      case 'Home':
-        return (
+  return (
+    <SafeAreaView style={styles.appContainer}>
+      <StatusBar barStyle="light-content" backgroundColor="#1e1b4b" />
+      <View style={styles.header}>
+        <Text style={styles.headerLogo}>CP</Text>
+        <TouchableOpacity onPress={() => setMenuOpen(true)}><Text style={styles.threeDots}>⋮</Text></TouchableOpacity>
+      </View>
+
+      <Modal visible={menuOpen} transparent={true} animationType="fade">
+        <TouchableOpacity style={styles.modalBg} activeOpacity={1} onPress={() => setMenuOpen(false)}>
+          <View style={styles.menuBox}>
+            <Text style={styles.menuEmail}>{user.email}</Text>
+            <View style={styles.menuLine} />
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Wallet'); setMenuOpen(false); }}><Text style={styles.menuText}>💰 Wallet / KYC</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Settings'); setMenuOpen(false); }}><Text style={styles.menuText}>⚙️ Settings</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={() => { handleLogOut(); setMenuOpen(false); }}><Text style={[styles.menuText, {color: '#ff4444'}]}>🚪 Log Out</Text></TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      
+      <View style={styles.mainArea}>
+        {activeTab === 'Home' && (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Hello Creator! 👋</Text>
             <Text style={styles.screenSub}>Explore the creator universe.</Text>
             <View style={styles.brandCard}><Text style={styles.brandName}>Your Total Reach</Text><Text style={styles.brandPay}>0 Views</Text></View>
           </View>
-        );
-      case 'AI Studio':
-        return (
+        )}
+        {activeTab === 'AI Studio' && (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>AI Video Studio 🤖</Text>
             <Text style={styles.screenSub}>Convert scripts into cinematic anime videos.</Text>
@@ -224,101 +241,62 @@ export default function App() {
               </View>
             )}
           </View>
-        );
-      case 'Reels':
-        return (
+        )}
+        {activeTab === 'Reels' && (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Create Reels 🎬</Text>
             <Text style={styles.screenSub}>Upload and showcase your creations.</Text>
             <TouchableOpacity style={styles.uploadBtn}><Text style={styles.uploadText}>+ Upload New Reel</Text></TouchableOpacity>
           </View>
-        );
-      case 'Help':
-        return (
+        )}
+        {activeTab === 'Help' && (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Help & Support 🎧</Text>
             <Text style={styles.screenSub}>Our support desk is active 24/7.</Text>
             <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Chat with Support Team</Text></TouchableOpacity>
           </View>
-        );
-      case 'Wallet':
-        return (
+        )}
+        {activeTab === 'Wallet' && (
           <ScrollView style={styles.screenContent} showsVerticalScrollIndicator={false}>
             <Text style={styles.screenTitle}>Wallet & KYC 💰</Text>
-            
             {!showKycForm ? (
               <View style={styles.card}>
                 <Text style={styles.balanceTitle}>Available Balance</Text>
                 <Text style={styles.balanceAmt}>₹0.00</Text>
-                
                 {kycCompleted ? (
-                  <View style={styles.kycSuccessBadge}>
-                    <Text style={styles.kycSuccessText}>✓ KYC Verified</Text>
-                  </View>
+                  <View style={styles.kycSuccessBadge}><Text style={styles.kycSuccessText}>✓ KYC Verified</Text></View>
                 ) : (
-                  <TouchableOpacity style={styles.withdrawBtn} onPress={() => setShowKycForm(true)}>
-                    <Text style={styles.withdrawText}>Complete KYC / Withdraw</Text>
-                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.withdrawBtn} onPress={() => setShowKycForm(true)}><Text style={styles.withdrawText}>Complete KYC / Withdraw</Text></TouchableOpacity>
                 )}
               </View>
             ) : (
               <View style={styles.form}>
                 <Text style={styles.formHeading}>KYC Verification Form</Text>
-                
                 <TextInput style={styles.input} placeholder="Full Name (As per Bank)" placeholderTextColor="#999" value={kycName} onChangeText={setKycName} />
                 <TextInput style={styles.input} placeholder="UPI ID (e.g., name@okaxis)" placeholderTextColor="#999" value={kycUpi} onChangeText={setKycUpi} autoCapitalize="none" />
                 <TextInput style={styles.input} placeholder="Bank Account Number" placeholderTextColor="#999" value={kycBank} onChangeText={setKycBank} keyboardType="number-pad" />
                 <TextInput style={styles.input} placeholder="IFSC Code" placeholderTextColor="#999" value={kycIfsc} onChangeText={setKycIfsc} autoCapitalize="characters" />
-                
                 {kycSubmitting ? (
                   <ActivityIndicator size="large" color="#a100ff" style={{ marginTop: 10 }} />
                 ) : (
                   <View style={styles.formButtonsRow}>
-                    <TouchableOpacity style={[styles.loginBtn, {flex: 1, marginTop: 0, marginRight: 10}]} onPress={submitKyc}>
-                      <Text style={styles.loginText}>Submit Details</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.loginBtn, {backgroundColor: '#ff4444', marginTop: 0, paddingHorizontal: 15}]} onPress={() => setShowKycForm(false)}>
-                      <Text style={styles.loginText}>Cancel</Text>
-                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.loginBtn, {flex: 1, marginTop: 0, marginRight: 10}]} onPress={submitKyc}><Text style={styles.loginText}>Submit Details</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.loginBtn, {backgroundColor: '#ff4444', marginTop: 0, paddingHorizontal: 15}]} onPress={() => setShowKycForm(false)}><Text style={styles.loginText}>Cancel</Text></TouchableOpacity>
                   </View>
                 )}
               </View>
             )}
           </ScrollView>
-        );
-      case 'Settings':
-        return (
+        )}
+        {activeTab === 'Settings' && (
           <View style={styles.screenContent}>
             <Text style={styles.screenTitle}>Settings ⚙️</Text>
             <Text style={styles.screenSub}>Account: {user.email}</Text>
             <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Change Password</Text></TouchableOpacity>
             <TouchableOpacity style={styles.helpBox}><Text style={styles.helpText}>Delete Account</Text></TouchableOpacity>
           </View>
-        );
-    }
-  };
-
-  return (
-    <SafeAreaView style={styles.appContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#1e1b4b" />
-      <View style={styles.header}>
-        <Text style={styles.headerLogo}>CP</Text>
-        <TouchableOpacity onPress={() => setMenuOpen(true)}><Text style={styles.threeDots}>⋮</Text></TouchableOpacity>
+        )}
       </View>
-
-      <Modal visible={menuOpen} transparent={true} animationType="fade">
-        <TouchableOpacity style={styles.modalBg} activeOpacity={1} onPress={() => setMenuOpen(false)}>
-          <View style={styles.menuBox}>
-            <Text style={styles.menuEmail}>{user.email}</Text>
-            <View style={styles.menuLine} />
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Wallet'); setMenuOpen(false); }}><Text style={styles.menuText}>💰 Wallet / KYC</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { setActiveTab('Settings'); setMenuOpen(false); }}><Text style={styles.menuText}>⚙️ Settings</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { handleLogOut(); setMenuOpen(false); }}><Text style={[styles.menuText, {color: '#ff4444'}]}>🚪 Log Out</Text></TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-      
-      <View style={styles.mainArea}>{renderScreen()}</View>
 
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} onPress={() => setActiveTab('Home')}>
@@ -378,4 +356,7 @@ const styles = StyleSheet.create({
   uploadText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   helpBox: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 15, alignItems: 'center', marginBottom: 15 },
   helpText: { color: '#4ade80', fontSize: 16, fontWeight: 'bold' },
-  s
+  studioBox: { width: '100%' },
+  processingCard: { backgroundColor: '#1e1b4b', padding: 30, borderRadius: 20, alignItems: 'center', marginTop: 20 },
+  processingPercentage: { color: '#fff', fontSize: 32, fontWeight: 'bold', marginTop: 15 },
+  progressBarTrack: { width: '100%', height: 8, backgroundColor: '#312e81', borderRadius: 4
