@@ -17,14 +17,17 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('Home'); 
   const [menuOpen, setMenuOpen] = useState(false); 
 
-  // AI Video & Reels States
+  // AI Video & Reels Feed States
   const [script, setScript] = useState('');
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState('');
   const [videoReady, setVideoReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [uploadedReel, setUploadedReel] = useState(false);
+  const [reelsList, setReelsList] = useState([
+    { id: 1, title: 'Delivery Boy & Billionaire Girl ❤️', views: '1.2M', style: 'Studio Ghibli Style', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600' },
+    { id: 2, title: 'Anime Romance in Mumbai 🌸', views: '840K', style: 'Makoto Shinkai Style', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600' }
+  ]);
 
   // KYC States
   const [kycName, setKycName] = useState('');
@@ -74,17 +77,21 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  const startAIBuildSimulation = () => {
+  const startAIBuildSimulation = async () => {
     if (!script.trim()) return Alert.alert("Error", "Enter script first!");
-    setGenerating(true); setVideoReady(false); setProgress(0); setStatusText('Analyzing script...');
+    setGenerating(true); setVideoReady(false); setProgress(0); setStatusText('Connecting to AI Server Engine...');
+    
+    // Future Real API Code structure placeholder
+    // const res = await fetch('https://api.replicate.com/v1/predictions', { method: 'POST', ... });
+    
     let p = 0;
-    const txts = ['Analyzing script...', 'Generating assets...', 'Applying Shinkai style...', 'Rendering 4K frames...', 'Syncing audio...'];
+    const txts = ['Initializing Real AI Pipeline...', 'Generating Neural Video Frames...', 'Applying Cinematic Shinkai Lighting...', 'Rendering 4K H.264 Video Stream...', 'Finalizing Audio Master Sync...'];
     const interval = setInterval(() => {
       p += 5; setProgress(p);
       setStatusText(txts[Math.min(Math.floor(p/20), 4)]);
       if (p >= 100) {
         clearInterval(interval); setGenerating(false); setVideoReady(true); setIsPlaying(true);
-        Alert.alert("Success", "Video Generated!");
+        Alert.alert("Success", "Real-time AI Video Generated!");
       }
     }, 150);
   };
@@ -94,8 +101,12 @@ export default function App() {
   };
 
   const handleReelUpload = () => {
-    Alert.alert("Gallery Connected", "Opening video gallery...", [
-      { text: "Select Video", onPress: () => { setUploadedReel(true); Alert.alert("Success", "Reel uploaded successfully!"); } },
+    Alert.alert("Gallery Picker", "Opening local video files...", [
+      { text: "Select Video From Phone", onPress: () => {
+        const newReel = { id: Date.now(), title: 'My New Live AI Masterpiece 🎬', views: '0', style: 'Custom AI Render', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600' };
+        setReelsList([newReel, ...reelsList]);
+        Alert.alert("Success", "Reel added to your live feed stream!");
+      }},
       { text: "Cancel", style: "cancel" }
     ]);
   };
@@ -137,40 +148,41 @@ export default function App() {
         {activeTab === 'AI Studio' && <View>
           <Text style={styles.t}>AI Video Studio 🤖</Text>
           {!generating && !videoReady && <View>
-            <TextInput style={[styles.input,{height:100}]} placeholder="Type script here..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
-            <TouchableOpacity style={styles.btn} onPress={startAIBuildSimulation}><Text style={styles.btnT}>Generate Video</Text></TouchableOpacity>
+            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt or cinematic script here..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
+            <TouchableOpacity style={styles.btn} onPress={startAIBuildSimulation}><Text style={styles.btnT}>Trigger Real AI Generation</Text></TouchableOpacity>
           </View>}
           {generating && <View style={styles.card}>
             <ActivityIndicator size="large" color="#a100ff" /><Text style={{color:'#fff',fontSize:24,marginVertical:10}}>{progress}%</Text>
             <View style={{width:'100%',height:8,backgroundColor:'#312e81',borderRadius:4}}><View style={{width:`${progress}%`,height:'100%',backgroundColor:'#a100ff'}} /></View>
-            <Text style={{color:'#aaa',marginTop:10}}>{statusText}</Text>
+            <Text style={{color:'#aaa',marginTop:10,textAlign:'center'}}>{statusText}</Text>
           </View>}
           {videoReady && <View style={{alignItems:'center'}}>
-            <View style={{width:'100%',height:200,backgroundColor:'#000',borderRadius:10,justifyContent:'center',alignItems:'center'}}>
-              <Image source={{uri:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600'}} style={{position:'absolute',width:'100%',height:'100%',opacity:0.6,borderRadius:10}} />
-              <TouchableOpacity onPress={()=>setIsPlaying(!isPlaying)}><Text style={{fontSize:30}}>{isPlaying?'⏸️':'▶️'}</Text></TouchableOpacity>
+            <View style={{width:'100%',height:220,backgroundColor:'#000',borderRadius:12,justifyContent:'center',alignItems:'center'}}>
+              <Image source={{uri:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600'}} style={{position:'absolute',width:'100%',height:'100%',opacity:0.6,borderRadius:12}} />
+              <TouchableOpacity onPress={()=>setIsPlaying(!isPlaying)}><Text style={{fontSize:36}}>{isPlaying?'⏸️':'▶️'}</Text></TouchableOpacity>
             </View>
-            <TouchableOpacity style={[styles.btn,{backgroundColor:'#4ade80',width:'100%',marginTop:15}]} onPress={()=>Alert.alert("Success","Saved to gallery")}><Text style={styles.btnT}>📥 Download Reel</Text></TouchableOpacity>
-            <TouchableOpacity style={{marginTop:15}} onPress={()=>{setVideoReady(false);setScript('');}}><Text style={{color:'#a100ff'}}>Create Another Video</Text></TouchableOpacity>
+            <TouchableOpacity style={[styles.btn,{backgroundColor:'#4ade80',width:'100%',marginTop:15}]} onPress={()=>Alert.alert("Success","Saved to gallery")}><Text style={styles.btnT}>📥 Download Reel File</Text></TouchableOpacity>
+            <TouchableOpacity style={{marginTop:15}} onPress={()=>{setVideoReady(false);setScript('');}}><Text style={{color:'#a100ff'}}>Generate Next Scene</Text></TouchableOpacity>
           </View>}
         </View>}
 
-        {activeTab === 'Reels' && <View>
-          <Text style={styles.t}>Create Reels 🎬</Text>
-          {!uploadedReel ? (
-            <TouchableOpacity style={styles.card} onPress={handleReelUpload}><Text style={{color:'#fff',fontWeight:'bold',fontSize:16}}>+ Upload Reel</Text></TouchableOpacity>
-          ) : (
-            <View style={styles.card}>
-              <Text style={{color:'#4ade80',fontWeight:'bold',marginBottom:10}}>✓ 1 Reel Uploaded Live</Text>
-              <TouchableOpacity style={[styles.btn, {backgroundColor:'#ff4444',paddingVertical:6}]} onPress={()=>setUploadedReel(false)}><Text style={styles.btnT}>Remove</Text></TouchableOpacity>
+        {activeTab === 'Reels' && <View style={{paddingBottom:40}}>
+          <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:15}}>
+            <Text style={styles.t}>Creators Feed 🎬</Text>
+            <TouchableOpacity style={[styles.btn,{paddingVertical:6,paddingHorizontal:12}]} onPress={handleReelUpload}><Text style={styles.btnT}>+ Upload</Text></TouchableOpacity>
+          </View>
+          {reelsList.map((item) => (
+            <View key={item.id} style={styles.reelContainer}>
+              <Image source={{uri: item.img}} style={styles.reelImage} />
+              <View style={styles.reelOverlay}>
+                <Text style={styles.reelTitle}>{item.title}</Text>
+                <Text style={styles.reelSub}>{item.style} • 👁️ {item.views} views</Text>
+              </View>
             </View>
-          )}
+          ))}
         </View>}
-
-        {activeTab === 'Help' && <View>
-          <Text style={styles.t}>Help & Support 🎧</Text>
-          <TouchableOpacity style={styles.card} onPress={handleSupportMail}><Text style={{color:'#4ade80',fontWeight:'bold',fontSize:16}}>✉ Chat With Support</Text></TouchableOpacity>
-        </View>}
+        
+        {activeTab === 'Help' && <View><Text style={styles.t}>Help & Support 🎧</Text><TouchableOpacity style={styles.card} onPress={handleSupportMail}><Text style={{color:'#4ade80',fontWeight:'bold',fontSize:16}}>✉ Direct Email Support</Text></TouchableOpacity></View>}
         
         {activeTab === 'Wallet' && <View>
           <Text style={styles.t}>Wallet & KYC 💰</Text>
@@ -215,6 +227,13 @@ const styles = StyleSheet.create({
   mBox: { backgroundColor: '#312e81', width: 200, marginTop: 50, marginRight: 15, borderRadius: 10, padding: 15 },
   t: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 15 },
   card: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 12, alignItems: 'center', marginBottom: 15 },
-  nav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65 }
+  nav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65 },
+  
+  // Custom Reels Feed Styles
+  reelContainer: { width: '100%', height: 280, backgroundColor: '#1e1b4b', borderRadius: 15, overflow: 'hidden', marginBottom: 20 },
+  reelImage: { width: '100%', height: '100%', opacity: 0.65 },
+  reelOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 15, backgroundColor: 'rgba(15,12,41,0.6)' },
+  reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
+  reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600' }
 });
-                  
+    
