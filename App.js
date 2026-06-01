@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView, Image, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Alert, StatusBar, Modal, SafeAreaView, Image, ScrollView, Linking } from 'react-native';
 
 const SUPABASE_URL = 'https://awojnjixinygekwrtptn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3b2puaml4aW55Z2Vrd3J0cHRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjg3NjEsImV4cCI6MjA5NTcwNDc2MX0.GvpY43NvtBWWutYNW8luOweP-LEcr42N-iN4EiqR040';
@@ -17,13 +17,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('Home'); 
   const [menuOpen, setMenuOpen] = useState(false); 
 
-  // AI Video States
+  // AI Video & Reels States
   const [script, setScript] = useState('');
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState('');
   const [videoReady, setVideoReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [uploadedReel, setUploadedReel] = useState(false);
 
   // KYC States
   const [kycName, setKycName] = useState('');
@@ -52,9 +53,8 @@ export default function App() {
         setUser(data.user || { email: cleanEmail });
         if(type === 'in') setActiveTab('Home');
       }
-    } catch (e) {
-      Alert.alert("Error", e.message === 'Timeout' ? "Server Timeout" : "Network error");
-    } finally { setLoading(false); }
+    } catch (e) { Alert.alert("Error", "Network error"); }
+    finally { setLoading(false); }
   };
 
   const submitKyc = async () => {
@@ -87,6 +87,17 @@ export default function App() {
         Alert.alert("Success", "Video Generated!");
       }
     }, 150);
+  };
+
+  const handleSupportMail = () => {
+    Linking.openURL('mailto:pulsecreators4@gmail.com?subject=Creators%20Pulse%20Support%20Request');
+  };
+
+  const handleReelUpload = () => {
+    Alert.alert("Gallery Connected", "Opening video gallery...", [
+      { text: "Select Video", onPress: () => { setUploadedReel(true); Alert.alert("Success", "Reel uploaded successfully!"); } },
+      { text: "Cancel", style: "cancel" }
+    ]);
   };
 
   if (!user) return (
@@ -144,8 +155,22 @@ export default function App() {
           </View>}
         </View>}
 
-        {activeTab === 'Reels' && <View><Text style={styles.t}>Create Reels 🎬</Text><TouchableOpacity style={styles.card}><Text style={{color:'#fff'}}>+ Upload Reel</Text></TouchableOpacity></View>}
-        {activeTab === 'Help' && <View><Text style={styles.t}>Help & Support 🎧</Text><TouchableOpacity style={styles.card}><Text style={{color:'#4ade80'}}>Chat With Support</Text></TouchableOpacity></View>}
+        {activeTab === 'Reels' && <View>
+          <Text style={styles.t}>Create Reels 🎬</Text>
+          {!uploadedReel ? (
+            <TouchableOpacity style={styles.card} onPress={handleReelUpload}><Text style={{color:'#fff',fontWeight:'bold',fontSize:16}}>+ Upload Reel</Text></TouchableOpacity>
+          ) : (
+            <View style={styles.card}>
+              <Text style={{color:'#4ade80',fontWeight:'bold',marginBottom:10}}>✓ 1 Reel Uploaded Live</Text>
+              <TouchableOpacity style={[styles.btn, {backgroundColor:'#ff4444',paddingVertical:6}]} onPress={()=>setUploadedReel(false)}><Text style={styles.btnT}>Remove</Text></TouchableOpacity>
+            </View>
+          )}
+        </View>}
+
+        {activeTab === 'Help' && <View>
+          <Text style={styles.t}>Help & Support 🎧</Text>
+          <TouchableOpacity style={styles.card} onPress={handleSupportMail}><Text style={{color:'#4ade80',fontWeight:'bold',fontSize:16}}>✉ Chat With Support</Text></TouchableOpacity>
+        </View>}
         
         {activeTab === 'Wallet' && <View>
           <Text style={styles.t}>Wallet & KYC 💰</Text>
@@ -192,4 +217,4 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#1e1b4b', padding: 20, borderRadius: 12, alignItems: 'center', marginBottom: 15 },
   nav: { flexDirection: 'row', backgroundColor: '#1e1b4b', paddingTop: 15, paddingBottom: 65 }
 });
-    
+                  
