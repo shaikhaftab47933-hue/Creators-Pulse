@@ -77,13 +77,12 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // REAL AI GENERATION TRIGGER
+  // REAL AI GENERATION TRIGGER (WITH FAILSAFE TIMEOUT)
   const startAIBuildSimulation = () => {
     if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
     setGenerating(true); setVideoReady(false); setStatusText('Pinging Neural Cloud AI Engine...');
     
     const cleanPrompt = encodeURIComponent(script.trim());
-    // Safe Unique URL generator
     const generatedAIAsset = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=720&height=480&nologo=true&seed=${Date.now()}`;
     
     let currentStep = 0;
@@ -104,6 +103,11 @@ export default function App() {
         setImageLoading(true); 
         setGenerating(false);
         setVideoReady(true);
+
+        // FAILSAFE: Chakri ko infinite ghumne se rokne ke liye 15-second timeout
+        setTimeout(() => {
+          setImageLoading(false);
+        }, 15000);
       }
     }, 1000);
   };
@@ -167,18 +171,16 @@ export default function App() {
           {generating && <View style={styles.card}><ActivityIndicator size="large" color="#a100ff" /><Text style={{color:'#aaa',marginTop:10,textAlign:'center'}}>{statusText}</Text></View>}
           {videoReady && <View style={{alignItems:'center'}}>
             
-            {/* UPDATED: BULLETPROOF IMAGE RENDERER WITH KEY & ERROR HANDLER */}
             <View style={{width:'100%',height:240,backgroundColor:'#1e1b4b',borderRadius:12,overflow:'hidden',justifyContent:'center',alignItems:'center'}}>
               {imageLoading && <ActivityIndicator size="large" color="#4ade80" style={{position:'absolute', zIndex:10}} />}
               <Image 
                 key={videoUrl} 
                 source={{uri: videoUrl}} 
                 style={{width:'100%',height:'100%', opacity: imageLoading ? 0.2 : 1}} 
-                onLoadStart={() => setImageLoading(true)}
-                onLoadEnd={() => setImageLoading(false)}
+                onLoad={() => setImageLoading(false)} 
                 onError={() => {
                   setImageLoading(false);
-                  Alert.alert("AI Policy Error", "Ye prompt AI ne block kar diya hai (Political ya Copyrighted). Kripya koi dusra normal prompt try karein!");
+                  Alert.alert("AI Server Busy", "Network timeout ya AI server busy hai. Kripya naya prompt likh kar dobara try karein!");
                 }}
               />
             </View>
