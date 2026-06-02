@@ -77,20 +77,28 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // REAL AI GENERATION TRIGGER (WITH FAILSAFE TIMEOUT)
+  // ADVANCED AI TRIGGER (With Long Prompt Fix & Hard Timeout)
   const startAIBuildSimulation = () => {
     if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
-    setGenerating(true); setVideoReady(false); setStatusText('Pinging Neural Cloud AI Engine...');
     
-    const cleanPrompt = encodeURIComponent(script.trim());
+    // FIX 1: Long Prompt Safety Trimmer
+    let safePrompt = script.trim();
+    if (safePrompt.length > 150) {
+      safePrompt = safePrompt.substring(0, 150); // Cut extra long text to prevent server hang
+    }
+    
+    const cleanPrompt = encodeURIComponent(safePrompt);
     const generatedAIAsset = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=720&height=480&nologo=true&seed=${Date.now()}`;
+    
+    setGenerating(true); 
+    setVideoReady(false); 
+    setStatusText('Pinging Cloud AI Engine...');
     
     let currentStep = 0;
     const trackingTexts = [
-      'Pinging Neural Cloud AI Engine...',
-      'Analyzing syntax tokens & style...',
-      'Compiling 4K high-fidelity graphics...',
-      'Finalizing cloud streaming pipeline...'
+      'Analyzing prompt semantics...',
+      'Compiling high-fidelity graphics...',
+      'Receiving neural cloud asset...'
     ];
 
     const pipelineTimer = setInterval(() => {
@@ -103,13 +111,21 @@ export default function App() {
         setImageLoading(true); 
         setGenerating(false);
         setVideoReady(true);
-
-        // FAILSAFE: Chakri ko infinite ghumne se rokne ke liye 15-second timeout
+        
+        // FIX 2: Ultimate Failsafe (Force stop spinner after 12 seconds)
         setTimeout(() => {
           setImageLoading(false);
-        }, 15000);
+        }, 12000);
       }
-    }, 1000);
+    }, 800);
+  };
+
+  const handleNextScene = () => {
+    // FIX 3: Clean state reset for next generation
+    setVideoReady(false);
+    setScript('');
+    setImageLoading(false);
+    setVideoUrl('');
   };
 
   const handleReelUpload = () => {
@@ -165,7 +181,7 @@ export default function App() {
         {activeTab === 'AI Studio' && <View>
           <Text style={styles.t}>AI Video Studio 🤖</Text>
           {!generating && !videoReady && <View>
-            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, flying car)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
+            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, cyberpunk city)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
             <TouchableOpacity style={styles.btn} onPress={startAIBuildSimulation}><Text style={styles.btnT}>Trigger Real AI Generation</Text></TouchableOpacity>
           </View>}
           {generating && <View style={styles.card}><ActivityIndicator size="large" color="#a100ff" /><Text style={{color:'#aaa',marginTop:10,textAlign:'center'}}>{statusText}</Text></View>}
@@ -173,20 +189,22 @@ export default function App() {
             
             <View style={{width:'100%',height:240,backgroundColor:'#1e1b4b',borderRadius:12,overflow:'hidden',justifyContent:'center',alignItems:'center'}}>
               {imageLoading && <ActivityIndicator size="large" color="#4ade80" style={{position:'absolute', zIndex:10}} />}
-              <Image 
-                key={videoUrl} 
-                source={{uri: videoUrl}} 
-                style={{width:'100%',height:'100%', opacity: imageLoading ? 0.2 : 1}} 
-                onLoad={() => setImageLoading(false)} 
-                onError={() => {
-                  setImageLoading(false);
-                  Alert.alert("AI Server Busy", "Network timeout ya AI server busy hai. Kripya naya prompt likh kar dobara try karein!");
-                }}
-              />
+              {videoUrl ? (
+                <Image 
+                  key={videoUrl} 
+                  source={{uri: videoUrl}} 
+                  style={{width:'100%',height:'100%', opacity: imageLoading ? 0.2 : 1}} 
+                  onLoad={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageLoading(false);
+                    Alert.alert("AI Error", "Network hang ho gaya hai ya prompt block hua. Kripya naya prompt likh kar dubara try karein!");
+                  }}
+                />
+              ) : null}
             </View>
 
             <TouchableOpacity style={[styles.btn,{backgroundColor:'#4ade80',width:'100%',marginTop:15}]} onPress={()=>Alert.alert("Success","Saved to gallery!")}><Text style={styles.btnT}>📥 Download Reel File</Text></TouchableOpacity>
-            <TouchableOpacity style={{marginTop:15}} onPress={()=>{setVideoReady(false);setScript('');}}><Text style={{color:'#a100ff'}}>Generate Next Scene</Text></TouchableOpacity>
+            <TouchableOpacity style={{marginTop:15}} onPress={handleNextScene}><Text style={{color:'#a100ff'}}>Generate Next Scene</Text></TouchableOpacity>
           </View>}
         </View>}
 
@@ -255,4 +273,3 @@ const styles = StyleSheet.create({
   reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600', marginTop: 4 }
 });
-  
