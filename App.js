@@ -23,7 +23,7 @@ export default function App() {
   const [statusText, setStatusText] = useState('');
   const [videoReady, setVideoReady] = useState(false);
   const [videoUrl, setVideoUrl] = useState('https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600');
-  const [imageLoading, setImageLoading] = useState(false); // Naya Loader State
+  const [imageLoading, setImageLoading] = useState(false); 
   
   const [reelsList, setReelsList] = useState([
     { id: 1, title: 'Delivery Boy & Billionaire Girl ❤️', views: '1.2M', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600' },
@@ -77,13 +77,13 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // REAL AI GENERATION TRIGGER (WITH LIVE CACHE BUSTER)
+  // REAL AI GENERATION TRIGGER
   const startAIBuildSimulation = () => {
     if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
     setGenerating(true); setVideoReady(false); setStatusText('Pinging Neural Cloud AI Engine...');
     
     const cleanPrompt = encodeURIComponent(script.trim());
-    // Date.now() seed ensure karega ki URL hamesha unique ho aur image hamesha load ho
+    // Safe Unique URL generator
     const generatedAIAsset = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=720&height=480&nologo=true&seed=${Date.now()}`;
     
     let currentStep = 0;
@@ -101,11 +101,11 @@ export default function App() {
       } else {
         clearInterval(pipelineTimer);
         setVideoUrl(generatedAIAsset);
-        setImageLoading(true); // Pre-loader chalu karo
+        setImageLoading(true); 
         setGenerating(false);
         setVideoReady(true);
       }
-    }, 1200);
+    }, 1000);
   };
 
   const handleReelUpload = () => {
@@ -161,20 +161,25 @@ export default function App() {
         {activeTab === 'AI Studio' && <View>
           <Text style={styles.t}>AI Video Studio 🤖</Text>
           {!generating && !videoReady && <View>
-            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, lion and deer)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
+            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, flying car)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
             <TouchableOpacity style={styles.btn} onPress={startAIBuildSimulation}><Text style={styles.btnT}>Trigger Real AI Generation</Text></TouchableOpacity>
           </View>}
           {generating && <View style={styles.card}><ActivityIndicator size="large" color="#a100ff" /><Text style={{color:'#aaa',marginTop:10,textAlign:'center'}}>{statusText}</Text></View>}
           {videoReady && <View style={{alignItems:'center'}}>
             
-            {/* ENHANCED IMAGE BOX WITH LOADER */}
-            <View style={{width:'100%',height:240,backgroundColor:'#000',borderRadius:12,overflow:'hidden',justifyContent:'center',alignItems:'center'}}>
+            {/* UPDATED: BULLETPROOF IMAGE RENDERER WITH KEY & ERROR HANDLER */}
+            <View style={{width:'100%',height:240,backgroundColor:'#1e1b4b',borderRadius:12,overflow:'hidden',justifyContent:'center',alignItems:'center'}}>
               {imageLoading && <ActivityIndicator size="large" color="#4ade80" style={{position:'absolute', zIndex:10}} />}
               <Image 
+                key={videoUrl} 
                 source={{uri: videoUrl}} 
                 style={{width:'100%',height:'100%', opacity: imageLoading ? 0.2 : 1}} 
                 onLoadStart={() => setImageLoading(true)}
                 onLoadEnd={() => setImageLoading(false)}
+                onError={() => {
+                  setImageLoading(false);
+                  Alert.alert("AI Policy Error", "Ye prompt AI ne block kar diya hai (Political ya Copyrighted). Kripya koi dusra normal prompt try karein!");
+                }}
               />
             </View>
 
@@ -248,3 +253,4 @@ const styles = StyleSheet.create({
   reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600', marginTop: 4 }
 });
+  
