@@ -23,6 +23,8 @@ export default function App() {
   const [statusText, setStatusText] = useState('');
   const [videoReady, setVideoReady] = useState(false);
   const [videoUrl, setVideoUrl] = useState('https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600');
+  const [imageLoading, setImageLoading] = useState(false); // Naya Loader State
+  
   const [reelsList, setReelsList] = useState([
     { id: 1, title: 'Delivery Boy & Billionaire Girl ❤️', views: '1.2M', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600' },
     { id: 2, title: 'Anime Romance in Mumbai 🌸', views: '840K', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600' }
@@ -75,21 +77,21 @@ export default function App() {
     } finally { setKycSubmitting(false); }
   };
 
-  // 100% REAL AI GENERATION TRIGGER (LIVE DEEP-LEARNING CALLS)
+  // REAL AI GENERATION TRIGGER (WITH LIVE CACHE BUSTER)
   const startAIBuildSimulation = () => {
     if (!script.trim()) return Alert.alert("Error", "Enter prompt first!");
     setGenerating(true); setVideoReady(false); setStatusText('Pinging Neural Cloud AI Engine...');
     
-    // Dynamic text-to-image AI prompt generator connection
     const cleanPrompt = encodeURIComponent(script.trim());
-    const generatedAIAsset = `https://image.pollinations.ai/p/${cleanPrompt}?width=720&height=480&seed=${Math.floor(Math.random() * 99999)}&nologo=true`;
+    // Date.now() seed ensure karega ki URL hamesha unique ho aur image hamesha load ho
+    const generatedAIAsset = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=720&height=480&nologo=true&seed=${Date.now()}`;
     
     let currentStep = 0;
     const trackingTexts = [
       'Pinging Neural Cloud AI Engine...',
-      'Analyzing syntax tokens & prompt style...',
+      'Analyzing syntax tokens & style...',
       'Compiling 4K high-fidelity graphics...',
-      'Finalizing secure cloud streaming pipeline...'
+      'Finalizing cloud streaming pipeline...'
     ];
 
     const pipelineTimer = setInterval(() => {
@@ -98,10 +100,10 @@ export default function App() {
         setStatusText(trackingTexts[currentStep]);
       } else {
         clearInterval(pipelineTimer);
-        setVideoUrl(generatedAIAsset); // Real prompt generated art binded dynamically
+        setVideoUrl(generatedAIAsset);
+        setImageLoading(true); // Pre-loader chalu karo
         setGenerating(false);
         setVideoReady(true);
-        Alert.alert("Success", "Real AI Generation Complete!");
       }
     }, 1200);
   };
@@ -159,12 +161,23 @@ export default function App() {
         {activeTab === 'AI Studio' && <View>
           <Text style={styles.t}>AI Video Studio 🤖</Text>
           {!generating && !videoReady && <View>
-            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, cartoon boy)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
+            <TextInput style={[styles.input,{height:100}]} placeholder="Enter prompt here (e.g. anime girl, lion and deer)..." placeholderTextColor="#777" multiline value={script} onChangeText={setScript} />
             <TouchableOpacity style={styles.btn} onPress={startAIBuildSimulation}><Text style={styles.btnT}>Trigger Real AI Generation</Text></TouchableOpacity>
           </View>}
           {generating && <View style={styles.card}><ActivityIndicator size="large" color="#a100ff" /><Text style={{color:'#aaa',marginTop:10,textAlign:'center'}}>{statusText}</Text></View>}
           {videoReady && <View style={{alignItems:'center'}}>
-            <View style={{width:'100%',height:240,backgroundColor:'#000',borderRadius:12,overflow:'hidden'}}><Image source={{uri: videoUrl}} style={{width:'100%',height:'100%'}} /></View>
+            
+            {/* ENHANCED IMAGE BOX WITH LOADER */}
+            <View style={{width:'100%',height:240,backgroundColor:'#000',borderRadius:12,overflow:'hidden',justifyContent:'center',alignItems:'center'}}>
+              {imageLoading && <ActivityIndicator size="large" color="#4ade80" style={{position:'absolute', zIndex:10}} />}
+              <Image 
+                source={{uri: videoUrl}} 
+                style={{width:'100%',height:'100%', opacity: imageLoading ? 0.2 : 1}} 
+                onLoadStart={() => setImageLoading(true)}
+                onLoadEnd={() => setImageLoading(false)}
+              />
+            </View>
+
             <TouchableOpacity style={[styles.btn,{backgroundColor:'#4ade80',width:'100%',marginTop:15}]} onPress={()=>Alert.alert("Success","Saved to gallery!")}><Text style={styles.btnT}>📥 Download Reel File</Text></TouchableOpacity>
             <TouchableOpacity style={{marginTop:15}} onPress={()=>{setVideoReady(false);setScript('');}}><Text style={{color:'#a100ff'}}>Generate Next Scene</Text></TouchableOpacity>
           </View>}
@@ -235,4 +248,3 @@ const styles = StyleSheet.create({
   reelTitle: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   reelSub: { color: '#4ade80', fontSize: 13, fontWeight: '600', marginTop: 4 }
 });
-    
