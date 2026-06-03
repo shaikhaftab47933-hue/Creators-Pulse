@@ -25,7 +25,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c8c7236e-f81c-43ad-8db0-8887820fc598"
+        "projectId": "4cae8cbf-1b1c-4ef4-9fc7-baa6fc3f60d7"
       }
     },
     "sdkVersion": "54.0.0",
@@ -35,3 +35,4 @@
     ]
   }
 }
+
