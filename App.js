@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Creators Pulse",
-    "slug": "creators-pulse",
+    "slug": "creators-pulse-new",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,16 +16,11 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.aftab.creatorspulse",
+      "package": "com.creatorspulse.app",
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
-    },
-    "extra": {
-      "eas": {
-        "projectId": "c8c7236e-f81c-43ad-8db0-8887820fc598"
       }
     },
     "sdkVersion": "54.0.0",
