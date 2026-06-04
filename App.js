@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "Creators Pulse",
@@ -25,7 +26,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "4cae8cbf-1b1c-4ef4-9fc7-baa6fc3f60d7"
+        "projectId": "d4ceabd7-1b4c-46f4-97c7-ba6df43fbbd7"
       }
     },
     "sdkVersion": "54.0.0",
@@ -35,3 +36,4 @@
     ]
   }
 }
+  
