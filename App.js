@@ -1,4 +1,5 @@
 
+  
 {
   "expo": {
     "name": "Creators Pulse",
@@ -36,4 +37,3 @@
     ]
   }
 }
-  
